@@ -6,23 +6,34 @@
 Porównaj wyniki poniższych zapytań:
 ```sql
 SELECT k.nazwa FROM klienci k;
+-- same imiona i nazwiska
 
 SELECT k.nazwa, z.idzamowienia FROM klienci k, zamowienia z;
+-- połaczone z id zamowienia dla klienta kazdy z kazdym
 
 SELECT k.nazwa, z.idzamowienia FROM klienci k, zamowienia z  
 WHERE z.idklienta = k.idklienta;
+-- Łączy tylko istotne nie robi iloczynu kartezjanskiego
 
 SELECT k.nazwa, z.idzamowienia FROM klienci k NATURAL JOIN zamowienia z;
+-- tak jak wyzej
 
 SELECT k.nazwa, z.idzamowienia FROM klienci k JOIN zamowienia z
 ON z.idklienta=k.idklienta;
+-- działa tak samo jak wyzej ale mamy do czynienia z inna skladnia
 
 SELECT k.nazwa, z.idzamowienia FROM klienci k JOIN zamowienia z
 USING (idklienta);
+-- Tak jak wyzej
 ```
 
 1. W którym zapytaniu występuje iloczyn kartezjański?
+
+    zapytanie drugie
+
 2. Które zapytanie dostarcza bezwartościowych danych?
+
+    Zapytanie drugie
 
 ## Zadanie 2
 
@@ -31,15 +42,20 @@ USING (idklienta);
 Napisz zapytanie w języku SQL wyświetlające informacje na temat zamówień (data realizacji, idzamowienia), które:
 1. zostały złożone przez klienta, który ma na imię Antoni,
 ```sql
+select z.datarealizacji, z.idzamowienia, k.nazwa from zamowienia z natural join klienci k where nazwa similar to '%Antoni%';
 ```
 2. zostały złożone przez klientów z mieszkań (zwróć uwagę na pole ulica),
 ```sql
+select z.datarealizacji, z.idzamowienia, k.ulica from zamowienia z natural join klienci k where ulica similar to '%/%';
 ```
 3. zostały złożone przez klienta z Krakowa do realizacji w listopadzie 2013 roku. *
 ```sql
+select z.datarealizacji, z.idzamowienia, k.miejscowosc from zamowienia z natural join klienci k where miejscowosc='Kraków' and datarealizacji between '01-11-2013' and '30-11-2013'; 
+select z.datarealizacji, z.idzamowienia, k.miejscowosc from zamowienia z join klienci k using (idklienta) where miejscowosc='Kraków' and datarealizacji between '01-11-2013' and '30-11-2013'; 
+select z.datarealizacji, z.idzamowienia, k.miejscowosc from zamowienia z join klienci k on z.idklienta=k.idklienta where miejscowosc='Kraków' and datarealizacji between '01-11-2013' and '30-11-2013'; 
 ```
 
-W każdym zapytaniu należy dodać dodatkowe pola (poza informacjami o zamówieniu), które pozwolą sprawdzić, czy wynik jest poprawny np. nazwa klienta, ulica etc.
+W każdym zapytaniu należy dodać dodatkowxe pola (poza informacjami o zamówieniu), które pozwolą sprawdzić, czy wynik jest poprawny np. nazwa klienta, ulica etc.
 
 ## Zadanie 3
 
@@ -48,21 +64,27 @@ W każdym zapytaniu należy dodać dodatkowe pola (poza informacjami o zamówien
 Napisz zapytanie w języku SQL wyświetlające informacje na temat klientów (nazwa, ulica, miejscowość), którzy:
 1. złożyli zamówienia z datą realizacji nie starszą niż sprzed pięciu lat
 ```sql
+select k.nazwa, k.ulica, k.miejscowosc from klienci k natural join zamowienia z where z.datarealizacji > (current_date-interval '5 years');
 ```
 2. zamówili pudełko Kremowa fantazja lub Kolekcja jesienna
 ```sql
+select pudelka.nazwa as "Pudełko", k.ulica, k.miejscowosc from klienci k join zamowienia using (idklienta) join artykuly using (idzamowienia) join pudelka using (idpudelka) where pudelka.nazwa='Kremowa fantazja' or pudelka.nazwa='Kolekcja jesienna';  
 ```
 3. złożyli przynajmniej jedno zamówienie
 ```sql
+select distinct nazwa, ulica, miejscowosc from klienci natural join zamowienia;
 ```
 4. nie złożyli żadnych zamówień
 ```sql
+select nazwa, ulica, miejscowosc from klienci left join zamowienia using (idklienta) where idzamowienia is null;
 ```
 5. złożyli zamówienia z datą realizacji w listopadzie 2013 *
 ```sql
+select nazwa, ulica, miejscowosc, datarealizacji from klienci natural join zamowienia where datarealizacji between '01-11-2013' and '30-11-2013';
 ```
 6. zamówili co najmniej 2 sztuki pudełek Kremowa fantazja lub Kolekcja jesienna w ramach jednego zamówienia *
 ```sql
+
 ```
 7. zamówili pudełka, które zawierają czekoladki z migdałami * 
 ```sql
