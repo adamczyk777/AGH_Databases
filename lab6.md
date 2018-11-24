@@ -15,6 +15,16 @@ koszt: 45 gr,
 masa: 20 g.
 ```
 ```sql
+insert into czekoladki VALUES (
+    'W98',
+    'Biały kieł',
+    'biała',
+    'laskowe',
+    'marcepan',
+    'Rozpływające się w rękach i kieszeniach',
+    0.45,
+    20
+)
 ```
 
 * Napisz i wykonaj trzy zapytania (użyj INSERT), które dodadzą do tabeli klienci następujące dane osobowe:
