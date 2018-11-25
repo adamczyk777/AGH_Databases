@@ -51,10 +51,13 @@ kod: 30-029,
 telefon: 501 498 324.
 ```
 ```sql
+insert into klienci values('90', 'Matusiak Edward', 'Kropiwnickiego 6/3', 'Leningrad', '31-471', '031 423 45 38');
 ```
 
 * Dodaj do tabeli klienci dane Izy Matusiak (idklienta 93). Pozostałe dane osobowe Izy Matusiak muszą być takie same jak dla Pana Edwarda Matusiaka. Użyj podzapytań.
 ```sql
+insert into klienci (select 94, 'Matusiak Iza', ulica, miejscowosc, kod, telefon from cukiernia.klienci where idklienta=90);
+
 ```
 
 **Sprawdź, czy napisane przez Ciebie zapytania odniosły pożądany skutek tj. czy do w/w tabel zostały dodane odpowiednie wiersze, wykorzystaj SELECT.**
@@ -78,6 +81,27 @@ Koszt: 26 gr,
 Masa: 36 g,
 ```
 ```sql
+insert into czekoladki values(
+    'X91',
+    'Nieznana Nieznajoma',
+    null,
+    null,
+    null,
+    'Niewidzialna czekoladka wspomagajaca odchudzanie.',
+    0.26,
+    0
+);
+
+insert into czekoladki values(
+    'M98',
+    'Mlezcny Raj',
+    'mleczna',
+    null,
+    null,
+    'NAksamitna mleczna czekolada w ksztalcie butelki z mlekiem.',
+    0.26,
+    36
+);
 ```
 Sprawdź, czy napisane przez Ciebie zapytania odniosły pożądany skutek tj. czy do w/w tabel zostały dodane odpowiednie wiersze, wykorzystaj SELECT.
 ## Zadanie 3
@@ -85,10 +109,12 @@ baza danych: cukiernia
 
 1. Napisz zapytanie, które usunie informacje dodane w Zadaniu 6.2, użyj DELETE.
 ```sql
+delete from czekoladki where idczekoladki in ('M98', 'X91');
 ```
 
 2. Sprawdź, czy odpowiednie rekordy zostały usunięte.
 ```sql
+select * from czekoladki where idczekoladki in ('M98', 'X91');
 ```
 3. Napisz i wykonaj zapytanie, które doda do tabeli czekoladki następujące pozycje, wykorzystaj nazwy kolumn w poleceniu INSERT:
 ```
@@ -106,6 +132,22 @@ Koszt: 26 gr,
 Masa: 36g,
 ```
 ```sql
+insert into czekoladki(idczekoladki, nazwa, opis, koszt, masa) values(
+    'X91',
+    'Nieznana Nieznajoma',
+    'Niewidzialna czekoladka wspomagajaca odchudzanie.',
+    0.26,
+    0
+);
+
+insert into czekoladki(idczekoladki, nazwa, czekolada, opis, koszt, masa) values (
+    'M98',
+    'Mlezcny Raj',
+    'mleczna',
+    'NAksamitna mleczna czekolada w ksztalcie butelki z mlekiem.',
+    0.26,
+    36
+);
 ```
 
 Sprawdź, czy napisane przez Ciebie zapytania odniosły pożądany skutek tj. czy do w/w tabel zostały dodane odpowiednie wiersze, wykorzystaj SELECT.
@@ -116,12 +158,17 @@ Napisz instrukcje aktualizujące dane w bazie cukiernia. Sprawdź za pomocą ins
 
 * Zmiana nazwiska Izy Matusiak na Nowak.
 ```sql
+update klienci set nazwa='Nowak Iza' where idklienta=94;
 ```
 * Obniżenie kosztu czekoladek o identyfikatorach (idczekoladki): W98, M98 i X91, o 10%.
 ```sql
+update czekoladki set koszt=(koszt*0.9) where idczekoladki in ('W98', 'M98', 'X91');
 ```
 * Ustalenie kosztu czekoladek o nazwie Nieznana Nieznajoma na taką samą jak cena czekoladki o identyfikatorze W98.
 ```sql
+update czekoladki
+set koszt=(select koszt from czekoladki where idczekoladki='W98')
+where nazwa='Nieznana Nieznajoma';
 ```
 * ★ Zmiana nazwy z Leningrad na Piotrograd w tabeli klienci.
 ```sql
@@ -136,6 +183,7 @@ Napisz instrukcje usuwające z bazy danych informacje o:
 
 * klientach o nazwisku Matusiak,
 ```sql
+delete from klienci where nazwa similar to '%Matusiak%';
 ```
 * ★ klientach o identyfikatorze większym niż 91,
 ```sql
@@ -166,9 +214,13 @@ baza danych: cukiernia
 
 * Napisz instrukcję UDPATE, która dla pudełek dodanych w poprzednich dwóch zadaniach, zwiększa o 1 liczbę czekoladek każdego smaku, które w nich występują.
 ```sql
+
 ```
 * Napisz skrypt zawierający instrukcje UPDATE, które modyfikują tabelę czekoladki zastępując w kolumnach: czekolada, orzechy i nadzienie wartości Null wartością “brak”.
 ```sql
+update czekoladki set czekolada='brak' where czekolada is null;
+update czekoladki set orzechy='brak' where orzechy is null;
+update czekoladki set nadzienie='brak' where nadzienie is null;
 ```
 * ★ Napisz skrypt zawierający instrukcje UPDATE, które anulują zmiany wprowadzone w poprzednim punkcie.
 ```sql
