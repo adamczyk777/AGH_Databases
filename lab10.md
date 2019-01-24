@@ -36,8 +36,51 @@ baza danych: cukiernia
 Napisz zapytanie wyświetlające informacje na temat zamówień (dataRealizacji, idzamowienia) używając odpowiedniego operatora in/not in/exists/any/all, które:
 
 * zostały złożone przez klienta, który ma na imię Antoni,
+
+```sql
+SELECT z.dataRealizacji, z.idzamowienia FROM zamowienia z 
+WHERE idklienta IN (SELECT idklienta FROM klienci WHERE nazwa SIMILAR TO '(\s|^)Aantoni(\b)');
+```
+
 * zostały złożone przez klientów z mieszkań (zwróć uwagę na pole ulica),
 * ★ zostały złożone przez klienta z Krakowa do realizacji w listopadzie 2013 roku.
+
+
+```sql
+select idzamowienia, dataRealizacji from zamowienia where idklienta 
+in (select idklienta from klienci where nazwa like '%Antoni');
+
+select idzamowienia, dataRealizacji from zamowienia where idklienta
+not in (select idklienta from klienci where nazwa not like '%Antoni');
+
+select idzamowienia, dataRealizacji from zamowienia z where 
+exists (select 1 from klienci k where z.idklienta = k.idklienta and k.nazwa like '%Antoni');
+
+select idzamowienia, dataRealizacji from zamowienia WHERE idklienta =
+any(select idklienta from klienci where nazwa like '%Antoni');
+
+select idzamowienia, dataRealizacji from zamowienia where idklienta !=
+all(select idklienta from klienci where nazwa not like '%Antoni');
+
+-- 2:
+
+select idzamowienia, datarealizacji from zamowienia where idklienta in 
+(select idklienta from klienci where ulica like '%/%');
+
+select idzamowienia, datarealizacji from zamowienia where idklienta not in
+(select idklienta from klienci where ulica not like '%/%');
+
+select idzamowienia, datarealizacji from zamowienia z where exists
+(select 1 from klienci k where z.idklienta = k.idklienta and k.ulica like '%/%');
+
+select idzamowienia, datarealizacji from zamowienia where idklienta = any
+(select idklienta from klienci where ulica like '%/%');
+
+select idzamowienia, datarealizacji from zamowienia where idklienta != ALL
+(select idklienta from klienci where ulica not like '%/%')
+
+
+```
 
 ## ★ Zadanie 10.3
 baza danych: cukiernia
