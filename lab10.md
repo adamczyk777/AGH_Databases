@@ -39,47 +39,21 @@ Napisz zapytanie wyświetlające informacje na temat zamówień (dataRealizacji,
 
 ```sql
 SELECT z.dataRealizacji, z.idzamowienia FROM zamowienia z 
-WHERE idklienta IN (SELECT idklienta FROM klienci WHERE nazwa SIMILAR TO '(\s|^)Aantoni(\b)');
+WHERE z.idklienta IN (SELECT idklienta FROM klienci WHERE nazwa LIKE '%Antoni');
 ```
 
 * zostały złożone przez klientów z mieszkań (zwróć uwagę na pole ulica),
+```sql
+SELECT z.dataRealizacji, z.idzamowienia FROM zamowienia z 
+WHERE z.idklienta IN (SELECT idklienta FROM klienci WHERE ulica LIKE '%/%' OR ulica LIKE '%m.%');
+```
+
 * ★ zostały złożone przez klienta z Krakowa do realizacji w listopadzie 2013 roku.
 
-
 ```sql
-select idzamowienia, dataRealizacji from zamowienia where idklienta 
-in (select idklienta from klienci where nazwa like '%Antoni');
-
-select idzamowienia, dataRealizacji from zamowienia where idklienta
-not in (select idklienta from klienci where nazwa not like '%Antoni');
-
-select idzamowienia, dataRealizacji from zamowienia z where 
-exists (select 1 from klienci k where z.idklienta = k.idklienta and k.nazwa like '%Antoni');
-
-select idzamowienia, dataRealizacji from zamowienia WHERE idklienta =
-any(select idklienta from klienci where nazwa like '%Antoni');
-
-select idzamowienia, dataRealizacji from zamowienia where idklienta !=
-all(select idklienta from klienci where nazwa not like '%Antoni');
-
--- 2:
-
-select idzamowienia, datarealizacji from zamowienia where idklienta in 
-(select idklienta from klienci where ulica like '%/%');
-
-select idzamowienia, datarealizacji from zamowienia where idklienta not in
-(select idklienta from klienci where ulica not like '%/%');
-
-select idzamowienia, datarealizacji from zamowienia z where exists
-(select 1 from klienci k where z.idklienta = k.idklienta and k.ulica like '%/%');
-
-select idzamowienia, datarealizacji from zamowienia where idklienta = any
-(select idklienta from klienci where ulica like '%/%');
-
-select idzamowienia, datarealizacji from zamowienia where idklienta != ALL
-(select idklienta from klienci where ulica not like '%/%')
-
-
+SELECT z.datarealizacji, z.idzamowienia FROM zamowienia z 
+WHERE z.idklienta IN (SELECT idklienta FROM klienci WHERE miejscowosc LIKE 'Kraków')
+AND date_part('year', z.datarealizacji)='2013' AND date_part('month', z.datarealizacji)='11';
 ```
 
 ## ★ Zadanie 10.3
@@ -88,11 +62,44 @@ baza danych: cukiernia
 Napisz zapytanie wyświetlające informacje na temat klientów (nazwa, ulica, miejscowość), używając odpowiedniego operatora in/not in/exists/any/all, którzy:
 
 * złożyli zamówienia z datą realizacji 12.11.2013,
+
+```sql
+SELECT k.nazwa, k.ulica, k.miejscowosc FROM klienci k WHERE
+k.idklienta IN (SELECT idklienta FROM zamowienia WHERE datarealizacji = '2013-11-12');
+```
+
 * złożyli zamówienia z datą realizacji w listopadzie 2013,
+
+```sql
+SELECT k.nazwa, k.ulica, k.miejscowosc FROM klienci k WHERE
+k.idklienta IN (SELECT idklienta FROM zamowienia 
+  WHERE date_part('month', datarealizacji) = '11' AND date_part('year', datarealizacji) = '2013');
+```
+
 * zamówili pudełko Kremowa fantazja lub Kolekcja jesienna,
+
+```sql
+SELECT k.nazwa, k.ulica, k.miejscowosc FROM klienci k WHERE
+k.idklienta = ANY(
+  SELECT za.idklienta FROM zamowienia za JOIN artykuly a USING(idzamowienia) JOIN pudelka p USING(idpudelka)
+  WHERE (p.nazwa LIKE '%Kremowa fantazja%' OR p.nazwa LIKE '%Kolekcja jesienna%')
+);
+```
+
 * zamówili co najmniej 2 sztuki pudełek Kremowa fantazja lub Kolekcja jesienna w ramach jednego zamówienia,
+
+```sql
+
+```
+
 * zamówili pudełka, które zawierają czekoladki z migdałami,
 * złożyli przynajmniej jedno zamówienie,
+
+```sql
+SELECT k.nazwa, k.ulica, k.miejscowosc FROM klienci k WHERE
+EXISTS (SELECT z.idklienta FROM zamowienia z WHERE z.idklienta = k.idklienta);
+```
+
 * nie złożyli żadnych zamówień.
 
 ## Zadanie 10.4
